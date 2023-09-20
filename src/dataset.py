@@ -77,7 +77,6 @@ class EuroSat_BaseDataloader(Dataset):
     def __len__(self):
         return len(self.all_data["path"])
         
-
 class EuroSat_AllBands(EuroSat_BaseDataloader):
 
     """ 
@@ -111,7 +110,6 @@ if __name__ == "__main__":
     import omegaconf
 
     cfg = omegaconf.OmegaConf.load("./configs/default.yaml")
-
 
     dataloader = hydra.utils.instantiate(cfg.dataset,
                                          train_val_key="train")

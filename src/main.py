@@ -15,7 +15,6 @@ def main(config : DictConfig) -> None:
     # do fancy AI stuff
     trainer = hydra.utils.instantiate(config.trainroutine)
     trainer = trainer(config)
-
     trainer.fit()
     trainer.finalize()
 

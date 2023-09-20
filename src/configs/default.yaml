@@ -1,20 +1,31 @@
-defaults:
-  - lrscheduler: "Constant"
+defaults:  
+  - _self_  
+  - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled  
+  
+hydra:  
+  output_subdir: null  
+  run:  
+    dir: .
 
 gpu_idx: 0
 seed: 42
-nEpochs: 300
-compile: True
+nEpochs: 100
 
-outputpath: "/home/user/results/s2_mae/firstBaseline"
+# where to store results
+outputpath: "/home/user/results/"
 experimentname: "default"
+
+# validation and save intervals
+validation_every_N_sampels: 5000
+special_save_nEpoch: [100,200]
 
 trainroutine:
   _target_: "train.EuroSat" # its not yet implementd rather hardcoded
   _partial_: true
 
-loss:
-  _target_: "torch.nn.CrossEntropy"
+lossfunction:
+  _target_: "torch.nn.CrossEntropyLoss"
 
 model:
   _target_: "model.VGG"
@@ -30,16 +41,14 @@ scheduler:
   warmup_epoch: 3
 
 dataset: 
-  _target_: "dataloader.EuroSat_AllBands"
-  topdir_dataset: "/home/jp/Code/pytorch_remote_sensing_template/data/EuroSATallBands_RESTRICTED/ds/images/remote_sensing/otherDatasets/sentinel_2/tif/"
+  _target_: "dataset.EuroSat_AllBands"
+  topdir_dataset: "/home/user/data/EuroSATallBands_RESTRICTED/ds/images/remote_sensing/otherDatasets/sentinel_2/tif/"
   validation_ratio: 0.3 # 0.3 is 30% sampels used for validation
 
 dataloader:
+  _target_: "torch.utils.data.DataLoader"
   shuffle: True
   batch_size: 64
   num_workers: 16
-  drop_last_batch: True
+  drop_last: True
 
-# validation and save intervals
-validation_every_N_sampels: -1 # after every epoch would be 
-special_save_nEpoch: [100,200]

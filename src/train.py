@@ -61,18 +61,22 @@ class BaseTrainer(ABC):
         # (its just a bit faster thats it...)
         torch.backends.cudnn.benchmark = True
 
-        # loading datasets 
-        self.train_set = hydra.utils.instantiate(config.dataloader, train_val_key="train")
-        self.val_set = hydra.utils.instantiate(config.dataloader, train_val_key="val")
+        # loading datasets and loader
+
+        self.train_data_set = hydra.utils.instantiate(config.dataset,
+                                                 train_val_key="train")
+        
+        self.val_data_set = hydra.utils.instantiate(config.dataset,
+                                               train_val_key="val")
 
         self.training_data_loader = hydra.utils.instantiate(config.dataloader,
-                                                            dataset=self.train_set)
+                                                            dataset=self.train_data_set)
+        
         self.val_data_loader = hydra.utils.instantiate(config.dataloader,
-                                                       dataset=self.val_set)
+                                                       dataset=self.val_data_set)
 
         # loss function
         self.lossfunction: torch.nn.Module = hydra.utils.instantiate(config.lossfunction)
-
 
         # load the model
         self.model: torch.nn.Module = hydra.utils.instantiate(config.model)
@@ -88,6 +92,7 @@ class BaseTrainer(ABC):
         # shift all on the GPU
         if self.cuda:
             self.model = self.model.cuda()
+            self.lossfunction = self.lossfunction.cuda()
 
         # setup tensorboard
         self.TB_writer = SummaryWriter(log_dir=os.path.join(self.savepath,"logs"))
@@ -101,10 +106,11 @@ class BaseTrainer(ABC):
         self.nextValidationstep = self.config.validation_every_N_sampels
         
         list_of_metrics = [
-                        Accuracy(task="multiclass", num_classes=config.dataloader.num_classes,average="micro"),
-                        F1Score(task="multiclass", num_classes=config.dataloader.num_classes,average="macro"),
-                        ConfusionMatrix(task="multiclass",num_classes=config.dataloader.num_classes)
+                        Accuracy(task="multiclass", num_classes=config.model.num_classes,average="micro"),
+                        F1Score(task="multiclass", num_classes=config.model.num_classes,average="macro"),
+                        ConfusionMatrix(task="multiclass",num_classes=config.model.num_classes)
                         ]
+        
         maximize_list=[True,True,True]
 
         if self.cuda:
@@ -144,6 +150,13 @@ class BaseTrainer(ABC):
             
             self._train_one_batch(batch)
             
+            if not self.config.validation_every_N_sampels == -1:
+                if (self.globalstep * self.config.dataloader.batch_size) >= self.nextValidationstep:
+                    self.model.eval()
+                    self._validate()                
+                    self.nextValidationstep += self.config.validation_every_N_sampels # set when to validate next time
+                    self.model.train() # set back to train mode
+
             pbar_train.update()
         pbar_train.close()        
         
@@ -183,17 +196,6 @@ class BaseTrainer(ABC):
         return None
               
     def finalize(self):
-
-        # save hyperparameters
-        self.TB_writer.add_hparams(
-                    {"lr": self.config.optimizer.lr,
-                     "bsize": self.config.dataloader.batch_size,
-                    },
-                    {
-                    "hparam/IoU": self.best_metric_saveCrit,
-                    },
-                    run_name="hparams"
-                )
 
         self.TB_writer.close()
         

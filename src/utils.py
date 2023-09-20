@@ -27,7 +27,6 @@ def preprocess_s2(s2):
 
     return np.clip(s2/10000,0,1)
 
-
 def plot_confusion_matrix(cm, class_names=None):
     """
     Returns a matplotlib figure containing the plotted confusion matrix.

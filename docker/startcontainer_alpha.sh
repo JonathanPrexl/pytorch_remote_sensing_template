@@ -6,4 +6,5 @@ docker build -t l91bjopr/pytorchtutorial \
 
 docker run -it --gpus all --privileged --shm-size=128g --name pytorchtutorial --ipc=host \
 -v /home/jprexl/Code/pytorch_remote_sensing_template/src:/home/user/src/ \
+-v /home/jprexl/Code/pytorch_remote_sensing_template/data:/home/user/data/ \
 l91bjopr/pytorchtutorial
