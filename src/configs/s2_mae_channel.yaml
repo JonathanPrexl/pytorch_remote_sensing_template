@@ -1,0 +1,69 @@
+defaults:
+  - lrscheduler: "Constant"
+
+gpu_idx: 0
+seed: 42
+nEpochs: 300
+compile: True
+
+outputpath: "/home/user/results/s2_mae/firstBaseline"
+experimentname: "channel"
+resume: False
+resumeCheckpoint: ""
+
+trainroutine:
+  _target_: "train.S2_MAE" # its not yet implementd rather hardcoded
+  _partial_: true
+
+loss:
+  _target_: "torch.nn.MSELoss"
+
+model:
+  _target_: "model.MAE_ViT"
+  encoder:
+    _target_: "model.MAE_Encoder_ChannelWise"
+    image_size: 128
+    num_channels: 10
+    patch_size: 16
+    emb_dim: 400
+    num_layer: 20
+    num_head: 8
+    mask_ratio: 33 # % of the patches that are shown to the model should be between 0 and 100
+    keep_one_channel_per_patch: False
+    keep_one_of_the_ten_meter_channels: False
+  decoder:
+    _target_: "model.MAE_Decoder_ChannelWise"
+    image_size: 128
+    num_channels: 10
+    patch_size: 16
+    emb_dim: 400
+    num_layer: 3
+    num_head: 8
+
+optimizer:
+  _target_: "torch.optim.Adam"
+  lr: 1e-4
+  base_learning_rate: 1e-4
+  weight_decay: 0.05
+
+scheduler: 
+  warmup_epoch: 3
+
+dataloader: 
+  _target_: "dataloader.Sen12MS"
+  _partial_: true
+  topdir_dataset: "/home/user/data/sen12ms"
+  relative_locations: "./preliminary/sen12ms_locations.json"
+  resample_img: True
+  resample_img_size: 128
+  shuffle: True
+  batch_size: 64
+  threads: 16
+  drop_last_batch: True
+
+restrict_train_data: -1
+restrict_val_data: -1
+validation_every_N_sampels: -1
+validate_after_every_n_epoch: -1
+plotting_every_N_sampels: 1600000
+special_save_nEpoch: [100,200]

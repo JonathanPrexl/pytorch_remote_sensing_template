@@ -1,0 +1,3 @@
+_target_: "torch.optim.lr_scheduler.PolynomialLR"
+total_iters: 10
+power: 2

@@ -1,0 +1,6 @@
+_target_: "torch.optim.lr_scheduler.CyclicLR"
+base_lr: 1e-8
+max_lr: ${optimizer.lr}
+step_size_up: 20
+mode: "triangular2"
+cycle_momentum: false
