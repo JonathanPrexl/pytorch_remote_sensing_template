@@ -1,0 +1,45 @@
+defaults:
+  - lrscheduler: "Constant"
+
+gpu_idx: 0
+seed: 42
+nEpochs: 300
+compile: True
+
+outputpath: "/home/user/results/s2_mae/firstBaseline"
+experimentname: "default"
+
+trainroutine:
+  _target_: "train.EuroSat" # its not yet implementd rather hardcoded
+  _partial_: true
+
+loss:
+  _target_: "torch.nn.CrossEntropy"
+
+model:
+  _target_: "model.VGG"
+  num_bands: 13
+  num_classes: 10   
+
+optimizer:
+  _target_: "torch.optim.Adam"
+  base_learning_rate: 1e-4 # * batch_size / 256 = final lr
+  weight_decay: 0.05
+
+scheduler: 
+  warmup_epoch: 3
+
+dataset: 
+  _target_: "dataloader.EuroSat_AllBands"
+  topdir_dataset: "/home/jp/Code/pytorch_remote_sensing_template/data/EuroSATallBands_RESTRICTED/ds/images/remote_sensing/otherDatasets/sentinel_2/tif/"
+  validation_ratio: 0.3 # 0.3 is 30% sampels used for validation
+
+dataloader:
+  shuffle: True
+  batch_size: 64
+  num_workers: 16
+  drop_last_batch: True
+
+# validation and save intervals
+validation_every_N_sampels: -1 # after every epoch would be 
+special_save_nEpoch: [100,200]

@@ -1,5 +1,5 @@
 ./src/outputs
-
+./data/EuroSATallBands_RESTRICTED
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
