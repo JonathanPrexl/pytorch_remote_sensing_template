@@ -1,8 +1,3 @@
-# Author: Jonathan Prexl
-# Copyied from:
-# https://github.com/IcarusWizard/MAE/
-# small changes and comments added, otherwise fully copied!
-
 import torch
 from torchvision.models import vgg19
 import numpy as np
