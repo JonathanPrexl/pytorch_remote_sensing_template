@@ -1,7 +1,7 @@
+import itertools
 import numpy as np
 import rasterio as rio
 import matplotlib.pyplot as plt
-import itertools
 
 def s2toRGB(x):
     B,G,R = x[:3]

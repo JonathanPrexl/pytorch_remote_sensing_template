@@ -1,18 +1,14 @@
-import torch
-
-# basic libarys
 import os
 import numpy as np
 from datetime import datetime
 import json
-from shutil import copyfile
-import matplotlib.pyplot as plt
 from tqdm import tqdm
 from omegaconf import OmegaConf
 from abc import ABC, abstractmethod
 import hydra
 
 # importing learning stuff
+import torch
 from torchmetrics import MetricTracker, MetricCollection
 from torchmetrics import Accuracy, ConfusionMatrix, F1Score
 from torch.utils.tensorboard import SummaryWriter
