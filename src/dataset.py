@@ -104,16 +104,12 @@ class EuroSat_AllBands(EuroSat_BaseDataloader):
 
 
 if __name__ == "__main__":
-
     import hydra
     import omegaconf
 
     cfg = omegaconf.OmegaConf.load("./configs/default.yaml")
 
-    dataloader = hydra.utils.instantiate(cfg.dataset,
-                                         train_val_key="train")
+    dataset = hydra.utils.instantiate(cfg.dataset, train_val_key="train")
+    dataset = hydra.utils.instantiate(cfg.dataset, train_val_key="val")
 
-    dataloader = hydra.utils.instantiate(cfg.dataset,
-                                         train_val_key="val")
-
-    print("data shape", dataloader.__getitem__(0)["s2"].shape)
+    print("data shape", dataset.__getitem__(0)["s2"].shape)
