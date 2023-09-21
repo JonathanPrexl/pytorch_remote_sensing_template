@@ -1,21 +1,16 @@
-#FROM pytorch/pytorch:1.7.1-cuda11.0-cudnn8-runtime # this could not use the transform colorjitter on only channel only so i swithced to newer troch version
 FROM pytorch/pytorch:1.11.0-cuda11.3-cudnn8-runtime
 
 MAINTAINER Jonathan Prexl
-
 
 # Install utils
 RUN apt update && apt install -y \
   tmux \
   htop \
   nano
-  
-  
 
 RUN pip install --upgrade pip
 
 # Install required packages
-
 RUN pip install fastprogress
 RUN pip install jupyter
 RUN pip install matplotlib
@@ -51,5 +46,5 @@ WORKDIR ${workdir}
 USER user
 
 
-CMD bash
+CMD echo "You are now inside a docker container!\n" && bash
 
