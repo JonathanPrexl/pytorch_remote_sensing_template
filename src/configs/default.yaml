@@ -8,7 +8,7 @@ hydra:
   run:  
     dir: .
 
-gpu_idx: 0
+gpu_idx: "cpu"
 seed: 42
 nEpochs: 100
 
@@ -21,7 +21,7 @@ validation_every_N_sampels: 5000
 special_save_nEpoch: [100,200]
 
 trainroutine:
-  _target_: "train.EuroSat" # its not yet implementd rather hardcoded
+  _target_: "train.EuroSat" # its not yet implemented rather hardcoded
   _partial_: true
 
 lossfunction:
@@ -34,8 +34,9 @@ model:
 
 optimizer:
   _target_: "torch.optim.Adam"
-  base_learning_rate: 1e-4 # * batch_size / 256 = final lr
+  lr: 1e-4
   weight_decay: 0.05
+  betas: [0.9, 0.95]
 
 scheduler: 
   warmup_epoch: 3

@@ -79,11 +79,11 @@ class BaseTrainer(ABC):
         
         summary(self.model)
 
-        self.optimizer = torch.optim.AdamW(self.model.parameters(),
-                                           lr=config.optimizer.base_learning_rate * config.dataloader.batch_size / 256,
-                                           betas=(0.9, 0.95),
-                                           weight_decay=config.optimizer.weight_decay)
-        
+        self.optimizer = hydra.utils.instantiate(
+            config.optimizer,
+            params=self.model.parameters(),
+        )
+
         # if you have a gpu we
         # shift all on the GPU
         if self.cuda:
