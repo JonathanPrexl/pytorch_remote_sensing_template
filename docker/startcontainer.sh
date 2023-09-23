@@ -18,6 +18,7 @@ docker build -t ${container_name} \
 # Add '--gpus all' to use GPUs in the container
 # This might also require '--privileged --ipc=host --shm-size=128G'
 docker run -it --name ${container_name} \
---volume /home/jprexl/Code/pytorch_remote_sensing_template/src:/home/user/src/ \
---volume /home/jprexl/Code/pytorch_remote_sensing_template/data:/home/user/data/ \
+--shm-size=8G \
+--volume /home/tom/dev-pytorch-template/src:/home/user/src/ \
+--volume /home/tom/dev-pytorch-template/data:/home/user/data/ \
 ${container_name}
