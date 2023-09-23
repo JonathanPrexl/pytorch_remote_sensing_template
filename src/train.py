@@ -49,7 +49,8 @@ class BaseTrainer(ABC):
 
         # store the config file that has been used
         # to make it more traceable
-        with open(os.path.join(self.savepath,"used_parameters.json"), 'w') as f:
+        output_config_json_path = os.path.join(self.savepath, "used_parameters.json")
+        with open(output_config_json_path, 'w') as f:
             json.dump(OmegaConf.to_container(config), f) 
 
         # sice we have constant imput size in each

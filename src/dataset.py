@@ -16,9 +16,10 @@ class EuroSat_BaseDataloader(Dataset):
                  topdir_dataset,
                  validation_ratio,
                  train_val_key):
+        assert os.path.isdir(topdir_dataset), ("'topdir_dataset' not a directory!", topdir_dataset)
 
         self.topdir_dataset = topdir_dataset
-        
+
         # Get all the locations of the data and
         # the corresponding label into
         # a pandas dataframe
@@ -78,7 +79,7 @@ class EuroSat_BaseDataloader(Dataset):
         
 class EuroSat_AllBands(EuroSat_BaseDataloader):
 
-    """ 
+    """
     returns emtpy tensor (there is no s1) S2 and Annotation Tensors in this order
     """
 
@@ -87,7 +88,8 @@ class EuroSat_AllBands(EuroSat_BaseDataloader):
 
 
     def __getitem__(self, i):
-
+        assert isinstance(i, int), ("Index has to be int!", i, type(i))
+        assert i >= 0, ("Index has to be positive!", i)
         s2_loc = self.all_data["path"][i]
         label = self.all_data["label"][i]
 
