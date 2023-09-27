@@ -16,6 +16,7 @@ class EuroSat_BaseDataloader(Dataset):
                  topdir_dataset,
                  validation_ratio,
                  train_val_key):
+
         assert os.path.isdir(topdir_dataset), ("'topdir_dataset' not a directory!", topdir_dataset)
 
         self.topdir_dataset = topdir_dataset
@@ -79,15 +80,8 @@ class EuroSat_BaseDataloader(Dataset):
         
 class EuroSat_AllBands(EuroSat_BaseDataloader):
 
-    """
-    returns emtpy tensor (there is no s1) S2 and Annotation Tensors in this order
-    """
-
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs) # Frag Thomas!
-
-
     def __getitem__(self, i):
+
         assert isinstance(i, int), ("Index has to be int!", i, type(i))
         assert i >= 0, ("Index has to be positive!", i)
         s2_loc = self.all_data["path"][i]
@@ -103,9 +97,31 @@ class EuroSat_AllBands(EuroSat_BaseDataloader):
 
         return {"s2":data_s2,"label":label}
 
+class EuroSat_RGB(EuroSat_AllBands):
+
+    def __getitem__(self, i):
+
+        assert isinstance(i, int), ("Index has to be int!", i, type(i))
+        assert i >= 0, ("Index has to be positive!", i)
+        s2_loc = self.all_data["path"][i]
+        label = self.all_data["label"][i]
+
+        # data
+        data_s2 = load_s2_image(s2_loc).astype("float32")
+        data_s2 = data_s2[[3,2,1]]
+        data_s2 = preprocess_s2(data_s2)        
+        data_s2 = torch.Tensor(data_s2)
+
+        # label
+        label = torch.Tensor([label]).long()
+
+        return {"s2":data_s2,"label":label}
+
+
 
 
 if __name__ == "__main__":
+    
     import hydra
     import omegaconf
 

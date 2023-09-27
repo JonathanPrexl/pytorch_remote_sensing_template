@@ -12,7 +12,6 @@ RUN pip install --upgrade pip
 
 # Install required packages
 RUN pip install fastprogress
-RUN pip install jupyter
 RUN pip install matplotlib
 RUN pip install tqdm
 RUN pip install tensorboard
@@ -29,6 +28,7 @@ RUN pip install shapely
 RUN pip install geopandas
 RUN conda install rasterio
 RUN pip install xarray
+RUN pip install jupyter
 
 # get the instructions from here:
 # https://docs.docker.com/engine/reference/builder/

@@ -19,6 +19,8 @@ from utils import plot_confusion_matrix
 # =============================== Abstract Baseclass of Trainer ==================================
 
 class BaseTrainer(ABC):
+
+    """ ABC --> its not allowed to instantiate this class directly"""
     
     def __init__(self,config):
         
@@ -59,7 +61,6 @@ class BaseTrainer(ABC):
         torch.backends.cudnn.benchmark = True
 
         # loading datasets and loader
-
         self.train_data_set = hydra.utils.instantiate(config.dataset,
                                                  train_val_key="train")
         
@@ -100,7 +101,7 @@ class BaseTrainer(ABC):
         
         # when to validate:
         # to make it comparable we dont do it after x batches rather after x sampels
-        self.nextValidationstep = self.config.validation_every_N_sampels
+        self.nextValidationstep = self.config.validation_every_N_samples
         
         list_of_metrics = [
                         Accuracy(task="multiclass", num_classes=config.model.num_classes,average="micro"),
@@ -147,11 +148,11 @@ class BaseTrainer(ABC):
             
             self._train_one_batch(batch)
             
-            if not self.config.validation_every_N_sampels == -1:
+            if not self.config.validation_every_N_samples == -1:
                 if (self.globalstep * self.config.dataloader.batch_size) >= self.nextValidationstep:
                     self.model.eval()
                     self._validate()                
-                    self.nextValidationstep += self.config.validation_every_N_sampels # set when to validate next time
+                    self.nextValidationstep += self.config.validation_every_N_samples # set when to validate next time
                     self.model.train() # set back to train mode
 
             pbar_train.update()
@@ -200,10 +201,10 @@ class BaseTrainer(ABC):
         
         return None
 
-class EuroSat(BaseTrainer):
 
-    def __init__(self, config):
-        super().__init__(config)
+# Custom Experiments
+
+class EuroSat(BaseTrainer):
 
     def _train_one_batch(self, batch):
         
@@ -268,3 +269,10 @@ class EuroSat(BaseTrainer):
                     self.TB_writer.add_figure(f"val/{key}", figure, global_step=self.globalstep)
 
         return None
+    
+
+class EuroSat_NewFinalize(EuroSat):
+    def finalize(self):
+        super().finalize()
+        print("I am done")
+        
