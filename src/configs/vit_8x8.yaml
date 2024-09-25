@@ -12,29 +12,35 @@ hydra:
 
 # Main Config
 
-gpu_idx: "cpu"
+gpu_idx: 0
 seed: 42
 nEpochs: 100
 
 # where to store results
 outputpath: "/home/user/results/"
-experimentname: "default"
+experimentname: "vit_8x8"
 
 # validation and save intervals
-validation_every_N_samples: 5000
+validation_every_N_samples: 25000
 special_save_nEpoch: [100,200]
 
 trainroutine:
-  _target_: "train.EuroSat" # its not yet implemented rather hardcoded
+  _target_: "train.EuroSat_ViT" # its not yet implemented rather hardcoded
   _partial_: true
 
 lossfunction:
   _target_: "torch.nn.CrossEntropyLoss"
 
 model:
-  _target_: "model.VGG"
-  num_bands: 13
-  num_classes: 10   
+  _target_: "model.ViT"
+  image_size: 64
+  num_channels: 13
+  patch_size: 8
+  num_classes: 10
+  embed_dim: 768
+  num_heads: 12
+  num_layers: 12
+  dropout: 0.1
 
 optimizer:
   _target_: "torch.optim.Adam"
@@ -42,8 +48,8 @@ optimizer:
 
 dataset: 
   _target_: "dataset.EuroSat_AllBands"
-  topdir_dataset: "/home/user/data/EuroSATallBands_RESTRICTED/ds/images/remote_sensing/otherDatasets/sentinel_2/tif/"
-  validation_ratio: 0.3 # 0.3 is 30% sampels used for validation
+  topdir_dataset: "/home/user/data/ds/images/remote_sensing/otherDatasets/sentinel_2/tif/"
+  split_file: "/home/user/src/aux/eurosat_split_20240919_12:41:08.json"
 
 dataloader:
   _target_: "torch.utils.data.DataLoader"

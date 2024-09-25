@@ -29,6 +29,7 @@ RUN pip install geopandas
 RUN conda install rasterio
 RUN pip install xarray
 RUN pip install jupyter
+RUN pip install einops
 
 # get the instructions from here:
 # https://docs.docker.com/engine/reference/builder/

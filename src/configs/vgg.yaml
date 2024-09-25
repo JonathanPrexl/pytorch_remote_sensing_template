@@ -1,0 +1,53 @@
+# This supresses the output folder
+# that otherwise is automaticly generated
+# by hydra
+defaults:  
+  - _self_  
+  - override hydra/hydra_logging: disabled  
+  - override hydra/job_logging: disabled  
+hydra:  
+  output_subdir: null  
+  run:  
+    dir: .
+
+# Main Config
+
+gpu_idx: 1
+seed: 42
+nEpochs: 100
+
+# where to store results
+outputpath: "/home/user/results/"
+experimentname: "cnn"
+
+# validation and save intervals
+validation_every_N_samples: 25000
+special_save_nEpoch: [100,200]
+
+trainroutine:
+  _target_: "train.EuroSat" # its not yet implemented rather hardcoded
+  _partial_: true
+
+lossfunction:
+  _target_: "torch.nn.CrossEntropyLoss"
+
+model:
+  _target_: "model.VGG"
+  num_bands: 13
+  num_classes: 10   
+
+optimizer:
+  _target_: "torch.optim.Adam"
+  lr: 1e-4
+
+dataset: 
+  _target_: "dataset.EuroSat_AllBands"
+  topdir_dataset: "/home/user/data/ds/images/remote_sensing/otherDatasets/sentinel_2/tif/"
+  split_file: "/home/user/src/aux/eurosat_split_20240919_12:41:08.json"
+
+dataloader:
+  _target_: "torch.utils.data.DataLoader"
+  shuffle: True
+  batch_size: 64
+  num_workers: 16
+  drop_last: True

@@ -6,6 +6,7 @@ from tqdm import tqdm
 from omegaconf import OmegaConf
 from abc import ABC, abstractmethod
 import hydra
+import matplotlib.pyplot as plt
 
 # importing learning stuff
 import torch
@@ -265,14 +266,77 @@ class EuroSat(BaseTrainer):
                 else:
                     # plot conf matrix
                     cm = self.tracker.compute()["MulticlassConfusionMatrix"].cpu().numpy()
-                    figure = plot_confusion_matrix(cm)
+                    figure = plot_confusion_matrix(cm, class_names=self.train_data_set.classnames)
                     self.TB_writer.add_figure(f"val/{key}", figure, global_step=self.globalstep)
+                    plt.close()
 
         return None
     
 
-class EuroSat_NewFinalize(EuroSat):
-    def finalize(self):
-        super().finalize()
-        print("I am done")
+class EuroSat_ViT(BaseTrainer):
+
+    def _train_one_batch(self, batch):
+        
+        s2 = batch["s2"]
+        label = batch["label"]
+        
+        if self.cuda:
+            s2 = s2.cuda()
+            label = label.cuda()
+        
+        prediction, _ = self.model(s2)
+
+        self.loss = self.lossfunction(prediction, label.squeeze())
+
+        self.optimizer.zero_grad()
+
+        self.loss.backward()
+
+        self.optimizer.step()
+
+        self.globalstep += 1
+
+        # write current train loss to tensorboard at every step
+        self.TB_writer.add_scalar("train/loss", self.loss, global_step=self.globalstep)
+        
+        return None
+
+    def _validate(self):
+
+        # start evaluation increment
+        self.tracker.increment()
+        current_eval_cycle = self.tracker.n_steps - 1 # starts with one so set it to zero
+            
+        with torch.no_grad():
+            
+            pbar_val = tqdm(total=len(self.val_data_loader), desc=f"EPOCH: {self.current_epoch}",leave=False)
+            pbar_val.set_description("validation")
+
+            for batch_idx, batch in enumerate(self.val_data_loader):
+                s2 = batch["s2"]
+                label = batch["label"]
+                if self.cuda:
+                    s2 = s2.cuda()
+                    label = label.cuda()
+                prediction, _ = self.model(s2)
+                self.tracker.update(prediction, label.squeeze())
+                pbar_val.update()
+                
+            pbar_val.close()   
+
+
+            # write to tensorboard
+            # here use current_eval_cycle instead of
+            # tracker.n_steps to index the array
+            for key, val in self.tracker.compute_all().items():
+                if not key == "MulticlassConfusionMatrix":
+                    self.TB_writer.add_scalar(f"val/{key}", val[current_eval_cycle], global_step=self.globalstep)
+                else:
+                    # plot conf matrix
+                    cm = self.tracker.compute()["MulticlassConfusionMatrix"].cpu().numpy()
+                    figure = plot_confusion_matrix(cm, class_names=self.train_data_set.classnames)
+                    self.TB_writer.add_figure(f"val/{key}", figure, global_step=self.globalstep)
+                    plt.close()
+
+        return None
         

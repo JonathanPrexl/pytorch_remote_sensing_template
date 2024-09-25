@@ -4,7 +4,7 @@ import os
 
 @hydra.main(version_base = None,
             config_path="./configs/",
-            config_name="default")
+            config_name="vit")
 def main(config : DictConfig) -> None:
 
     # we first have to set visible

@@ -4,7 +4,8 @@ import rasterio as rio
 import matplotlib.pyplot as plt
 
 def s2toRGB(x):
-    B,G,R = x[:3]
+    assert x.shape[0] == 13
+    B,G,R = x[1:4]
     X = np.stack([R,G,B],axis=-1)
     X = np.clip(X*4,0,1)
     return X
@@ -24,6 +25,9 @@ def preprocess_s2(s2):
     
     # devide by 10k to get the 0-100% reflection
     # window in the... then clip to [0,1]
+
+    # Be aware!!!! After 2022 the encoding of the S2 changed
+    # to be in the intervall [1000,10000] (but this is an older dataset)
 
     return np.clip(s2/10000,0,1)
 

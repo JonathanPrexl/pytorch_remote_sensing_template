@@ -17,8 +17,10 @@ docker build -t ${container_name} \
 # Change, which volumes are mounted!
 # Add '--gpus all' to use GPUs in the container
 # This might also require '--privileged --ipc=host --shm-size=128G'
-docker run -it --name ${container_name} \
+docker run -it --gpus all --name ${container_name} \
 --shm-size=8G \
---volume /home/jp/Code/pytorch_remote_sensing_template/src:/home/user/src/ \
---volume /home/jp/Code/pytorch_remote_sensing_template/data:/home/user/data/ \
+--volume /home/jprexl//Code/pytorch_remote_sensing_template/src:/home/user/src/ \
+--volume /home/jprexl/Data/EuroSATallBands/:/home/user/data/ \
+--volume /home/jprexl//Code/pytorch_remote_sensing_template/data:/home/user/datainference/ \
+--volume /home/jprexl/Results/MARS24_workshop/:/home/user/results/ \
 ${container_name}
